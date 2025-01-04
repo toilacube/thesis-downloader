@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/thesis-downloader/static/css/main.e9f3c28f.css",
+    "main.js": "/thesis-downloader/static/js/main.6ea41ad1.js",
+    "static/js/453.4ac8c144.chunk.js": "/thesis-downloader/static/js/453.4ac8c144.chunk.js",
+    "index.html": "/thesis-downloader/index.html",
+    "main.e9f3c28f.css.map": "/thesis-downloader/static/css/main.e9f3c28f.css.map",
+    "main.6ea41ad1.js.map": "/thesis-downloader/static/js/main.6ea41ad1.js.map",
+    "453.4ac8c144.chunk.js.map": "/thesis-downloader/static/js/453.4ac8c144.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e9f3c28f.css",
+    "static/js/main.6ea41ad1.js"
+  ]
+}
