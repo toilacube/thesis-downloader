@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Table, Input, Button } from "antd";
+import { Table, Input, Button, Switch, Typography } from "antd";
 import axios from "axios";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Markdown from "react-markdown";
 
 const { Search } = Input;
 
@@ -10,9 +11,21 @@ const App = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [downloadLoading, setDownloadLoading] = useState(null); // Loading state for individual downloads
-  const [downloadError, setDownloadError] = useState(null); // Track download errors
   const [isDownloadCancelled, setIsDownloadCancelled] = useState(false); // Track download cancel
   const [abortController, setAbortController] = useState(null); // Controller for aborting download
+
+  const localHost = "http://localhost:5000";
+  const serverHost = "https://thesis-downloader.onrender.com";
+  const [host, setHost] = useState(serverHost);
+
+
+  const instructions = `
+\`\`\`bash
+    docker pull toilacube/thesis-downloader:latest 
+
+    docker run -p 5000:5000  toilacube/thesis-downloader:latest
+\`\`\`
+  `;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,6 +43,16 @@ const App = () => {
     fetchData();
   }, []);
 
+  const hanleChangeHost = (checked) => {
+    if (checked) {
+      setHost(localHost);
+      toast.info("Switched to local mode, running on port 5000");
+    } else {
+      setHost("https://thesis-downloader.onrender.com");
+      toast.info("Switched to server mode, running on Render");
+    }
+  };
+
   const handleSearch = (value) => {
     const filtered = data.filter((item) =>
       item.title.toLowerCase().includes(value.toLowerCase())
@@ -39,7 +62,6 @@ const App = () => {
 
   const downloadFile = async (item) => {
     setDownloadLoading(item.key); // Set loading for the specific button
-    setDownloadError(null);
     setIsDownloadCancelled(false);
     const urlTemplate = item.url;
     const outputFilename = item.key.slice(-5) + ".pdf";
@@ -48,7 +70,7 @@ const App = () => {
 
     try {
       const response = await axios.post(
-        "https://thesis-downloader.onrender.com/create-pdf",
+        `${host}/create-pdf`,
         {
           url_template: urlTemplate,
           output_filename: outputFilename,
@@ -73,14 +95,12 @@ const App = () => {
       toast.success("Download completed successfully!");
     } catch (error) {
       if (axios.isCancel(error)) {
-        setDownloadError("Download cancelled by user.");
         toast.warn("Download cancelled by user.");
       } else if (error.code === "ECONNABORTED") {
-        setDownloadError("Request timed out after 15 minutes");
         toast.error("Request timed out after 15 minutes.");
       } else {
-        setDownloadError("Error downloading file");
-        toast.error("Error downloading file.");
+        if (host === localHost)
+        toast.error("Error downloading file. Please make sure the local server is running on port 5000");
       }
     } finally {
       setDownloadLoading(null); // Reset loading state
@@ -109,7 +129,13 @@ const App = () => {
           href={record.key}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: "blue", textDecoration: "underline", cursor: "pointer", fontSize: "18px", fontFamily: "Arial" }}
+          style={{
+            color: "blue",
+            textDecoration: "underline",
+            cursor: "pointer",
+            fontSize: "18px",
+            fontFamily: "Arial",
+          }}
         >
           {text}
         </a>
@@ -131,7 +157,9 @@ const App = () => {
             type="primary"
             onClick={() => downloadFile(record)}
             loading={downloadLoading === record.key}
-            disabled={downloadLoading !== null && downloadLoading !== record.key}
+            disabled={
+              downloadLoading !== null && downloadLoading !== record.key
+            }
           >
             Download
           </Button>
@@ -150,19 +178,79 @@ const App = () => {
 
   return (
     <div style={{ padding: "20px" }}>
-      <ToastContainer position="top-right" autoClose={1000} />
-      <h1 style={{ color: "red", textAlign: "center" }}>UIT Thesis Downloader</h1>
-      <div style={{ color: "red", textAlign: "center" }}> Tải 1 file mất tầm 5-10ph nhé piu pồ, server có 500mb ram thôi, tự tải source code về mà chạy cho lẹ</div>
+      <ToastContainer position="top-right" autoClose={3000} />
+      <h1
+        style={{
+          color: "#d32f2f",
+          textAlign: "center",
+          marginBottom: "10px",
+          fontSize: "48px",
+        }}
+      >
+        UIT Thesis Downloader
+      </h1>
+      {/* Subheader */}
+      <p
+        style={{
+          color: "#d32f2f",
+          textAlign: "center",
+          fontSize: "14px",
+          marginBottom: "20px",
+        }}
+      >
+        Tải 1 file mất tầm 5-10 phút nhé piu pồ, server có 500MB RAM thôi!
+      </p>
+      {/* Instructions and Switch */}
+      <div
+        style={{
+          textAlign: "center",
+          maxWidth: "600px",
+          margin: "0 auto",
+          padding: "20px",
+          backgroundColor: "#f9f9f9",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+        }}
+      >
+        <p
+          style={{ marginBottom: "15px", fontSize: "16px", fontWeight: "bold" }}
+        >
+          Chạy cái image này rồi bật mode local lên để tải file bằng local cho
+          lẹ cho tiện
+        </p>
+
+        {/* Markdown instructions */}
+        <div
+          style={{
+            textAlign: "left",
+            backgroundColor: "#fff",
+            padding: "10px 15px",
+            border: "1px solid #ddd",
+            borderRadius: "6px",
+            marginBottom: "20px",
+            fontSize: "14px",
+          }}
+        >
+          <Markdown>{instructions}</Markdown>
+        </div>
+
+        {/* Switch */}
+        <Switch
+          checkedChildren="Local"
+          unCheckedChildren="Server"
+          onChange={hanleChangeHost}
+        />
+      </div>
       <Search
         placeholder="Search by title"
         allowClear
         onSearch={handleSearch}
         style={{ marginBottom: "20px", width: "300px" }}
       />
-          <div style={{ marginBottom: "20px", fontWeight: "bold" }}>
+      <div style={{ marginBottom: "20px", fontWeight: "bold" }}>
         Total: {filteredData.length}
       </div>
-      {downloadError && <p style={{ color: "red" }}>{downloadError}</p>} {/* Display download error */}
+      {/* Display download error */}
       <Table
         columns={columns}
         dataSource={filteredData} // Use filteredData for rendering
@@ -175,13 +263,15 @@ const App = () => {
         }}
         bordered
       />
-      <div style={{
-        bottom: "20px",
-        right: "20px",
-        fontSize: "16px",
-        fontWeight: "bold",
-        color: "#555"
-      }}>
+      <div
+        style={{
+          bottom: "20px",
+          right: "20px",
+          fontSize: "16px",
+          fontWeight: "bold",
+          color: "#555",
+        }}
+      >
         made by toilacube
       </div>
     </div>
