@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/uit-thesis-downloader-ui/static/css/main.e9f3c28f.css",
-    "main.js": "/uit-thesis-downloader-ui/static/js/main.56a3ffd0.js",
+    "main.js": "/uit-thesis-downloader-ui/static/js/main.4cd3aaba.js",
     "static/js/453.4ac8c144.chunk.js": "/uit-thesis-downloader-ui/static/js/453.4ac8c144.chunk.js",
     "index.html": "/uit-thesis-downloader-ui/index.html",
     "main.e9f3c28f.css.map": "/uit-thesis-downloader-ui/static/css/main.e9f3c28f.css.map",
-    "main.56a3ffd0.js.map": "/uit-thesis-downloader-ui/static/js/main.56a3ffd0.js.map",
+    "main.4cd3aaba.js.map": "/uit-thesis-downloader-ui/static/js/main.4cd3aaba.js.map",
     "453.4ac8c144.chunk.js.map": "/uit-thesis-downloader-ui/static/js/453.4ac8c144.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e9f3c28f.css",
-    "static/js/main.56a3ffd0.js"
+    "static/js/main.4cd3aaba.js"
   ]
 }
